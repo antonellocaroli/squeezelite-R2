@@ -1,4 +1,4 @@
-/* 
+/*
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
@@ -7,7 +7,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,8 @@ static bool running = true;
 #define MAY_PROCESS(x)
 #endif
 
-static void *decode_thread() {
+// static void *decode_thread() {
+static void *decode_thread(void *arg) {
 
 	while (running) {
 		size_t bytes, space, min_space;
@@ -70,7 +71,7 @@ static void *decode_thread() {
 		LOCK_D;
 
 		if (decode.state == DECODE_RUNNING && codec) {
-		
+
 			LOG_SDEBUG("streambuf bytes: %u outputbuf space: %u", bytes, space);
 
 			IF_DIRECT(
@@ -79,9 +80,9 @@ static void *decode_thread() {
 			IF_PROCESS(
 				min_space = process.max_out_frames * BYTES_PER_FRAME;
 			);
-			
+
 			if (space > min_space && (bytes > codec->min_read_bytes || toend)) {
-				
+
 				decode.state = codec->decode();
 
 				IF_PROCESS(
@@ -108,7 +109,7 @@ static void *decode_thread() {
 				ran = true;
 			}
 		}
-		
+
 		UNLOCK_D;
 
 		if (!ran) {
@@ -235,9 +236,9 @@ void codec_open(u8_t format, u8_t sample_size, u8_t sample_rate, u8_t channels, 
 				LOG_INFO("closing codec: '%c'", codec->id);
 				codec->close();
 			}
-			
+
 			codec = codecs[i];
-			
+
 			codec->open(sample_size, sample_rate, channels, endianness);
 
 			decode.state = DECODE_READY;
@@ -251,4 +252,3 @@ void codec_open(u8_t format, u8_t sample_size, u8_t sample_rate, u8_t channels, 
 
 	LOG_ERROR("codec not found");
 }
-
