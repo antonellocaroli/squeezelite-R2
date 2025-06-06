@@ -1,13 +1,13 @@
-/* 
+/*
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *  
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,7 +42,7 @@ static void send_header(void) {
 
 	unsigned try = 0;
 	ssize_t n;
-	
+
 	while (len) {
 		n = send(fd, ptr, len, MSG_NOSIGNAL);
 		if (n <= 0) {
@@ -74,7 +74,8 @@ static void _disconnect(stream_state state, disconnect_code disconnect) {
 	wake_controller();
 }
 
-static void *stream_thread() {
+// static void *stream_thread() {
+static void *stream_thread(void *arg) {
 
 	while (running) {
 
@@ -139,7 +140,7 @@ static void *stream_thread() {
 				UNLOCK;
 				continue;
 			}
-					
+
 			if (pollinfo.revents & (POLLIN | POLLHUP)) {
 
 				// get response headers
@@ -180,11 +181,11 @@ static void *stream_thread() {
 					} else {
 						endtok = 0;
 					}
-				
+
 					UNLOCK;
 					continue;
 				}
-				
+
 				// receive icy meta data
 				if (stream.meta_interval && stream.meta_next == 0) {
 
@@ -222,7 +223,7 @@ static void *stream_thread() {
 						stream.meta_left -= n;
 						stream.header_len += n;
 					}
-					
+
 					if (stream.meta_left == 0) {
 						if (stream.header_len) {
 							*(stream.header + stream.header_len) = '\0';
@@ -243,7 +244,7 @@ static void *stream_thread() {
 					if (stream.meta_interval) {
 						space = min(space, stream.meta_next);
 					}
-					
+
 					n = recv(fd, streambuf->writep, space, 0);
 					if (n == 0) {
 						LOG_INFO("end of stream");
@@ -253,7 +254,7 @@ static void *stream_thread() {
 						LOG_INFO("error reading: %s", strerror(last_error()));
 						_disconnect(DISCONNECT, REMOTE_DISCONNECT);
 					}
-					
+
 					if (n > 0) {
 						_buf_inc_writep(streambuf, n);
 						stream.bytes += n;
@@ -266,15 +267,15 @@ static void *stream_thread() {
 						stream.state = STREAMING_HTTP;
 						wake_controller();
 					}
-				
+
 					LOG_SDEBUG("streambuf read %d bytes", n);
 				}
 			}
 
 			UNLOCK;
-			
+
 		} else {
-			
+
 			LOG_SDEBUG("poll timeout");
 		}
 	}
@@ -295,7 +296,7 @@ void stream_init(log_level level, unsigned stream_buf_size) {
 		LOG_ERROR("unable to malloc buffer");
 		exit(0);
 	}
-	
+
 	stream.state = STOPPED;
 	stream.header = malloc(MAX_HEADER);
 	*stream.header = '\0';
@@ -353,7 +354,7 @@ void stream_file(const char *header, size_t header_len, unsigned threshold) {
 		stream.state = DISCONNECT;
 	}
 	wake_controller();
-	
+
 	stream.cont_wait = false;
 	stream.meta_interval = 0;
 	stream.meta_next = 0;
