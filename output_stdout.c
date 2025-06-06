@@ -1,4 +1,4 @@
-/* 
+/*
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
@@ -7,7 +7,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,7 +50,7 @@ static int _stdout_write_frames(frames_t out_frames, bool silence, s32_t gainL, 
 	u8_t *obuf;
 
 	if (!silence) {
-		
+
 		if (output.fade == FADE_ACTIVE && output.fade_dir == FADE_CROSS && *cross_ptr) {
 			_apply_cross(outputbuf, out_frames, cross_gain_in, cross_gain_out, cross_ptr);
 		}
@@ -81,7 +81,8 @@ static int _stdout_write_frames(frames_t out_frames, bool silence, s32_t gainL, 
 	return (int)out_frames;
 }
 
-static void *output_thread() {
+// static void *output_thread() {
+static void *output_thread(void *arg) {
 
 	LOCK;
 
@@ -100,7 +101,7 @@ static void *output_thread() {
 	UNLOCK;
 
 	while (running) {
-		
+
 		LOCK;
 
 		output.device_frames = 0;
