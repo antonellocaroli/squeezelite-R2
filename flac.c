@@ -245,7 +245,8 @@ static bool load_flac() {
 	char name[30];
 	char *err;
 
-	sprintf(name, LIBFLAC, FLAC_API_VERSION_CURRENT < 12 ? 8 : 12);
+//	sprintf(name, LIBFLAC, FLAC_API_VERSION_CURRENT < 12 ? 8 : 12);
+sprintf(name, "libFLAC.so");
 
   handle = dlopen(name, RTLD_NOW);
 
